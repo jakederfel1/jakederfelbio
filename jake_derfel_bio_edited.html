@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jake Derfel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a18;
+    --ink-mid: #6b6b65;
+    --ink-faint: #a8a8a0;
+    --surface: #f5f3ef;
+    --rule: #d4d1c9;
+    --dot: #c8c4bc;
+  }
+
+  html { background: var(--surface); }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--ink);
+    background: var(--surface);
+    min-height: 100vh;
+    line-height: 1;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  header {
+    padding-top: 72px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(36px, 6vw, 52px);
+    font-weight: 200;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .header-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .meta-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--ink-mid);
+    letter-spacing: 0.06em;
+    line-height: 1.9;
+  }
+
+  .meta-line strong {
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dot);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  p {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--ink);
+    max-width: 52ch;
+  }
+
+  p + p { margin-top: 20px; }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 80px 1px 1fr;
+    gap: 0 20px;
+    position: relative;
+  }
+
+  .t-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    padding-top: 2px;
+    text-align: right;
+  }
+
+  .t-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .t-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--ink);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .t-connector {
+    flex: 1;
+    width: 1px;
+    background: var(--rule);
+    min-height: 32px;
+  }
+
+  .timeline-item:last-child .t-connector { background: transparent; }
+
+  .t-content { padding-bottom: 32px; }
+
+  .t-role {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 3px;
+  }
+
+  .t-org {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-mid);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .t-desc {
+    font-size: 12.5px;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+
+  .connect-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+  }
+
+  .connect-text { flex: 1; }
+
+  .connect-cta {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .cta-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .cta-link:hover {
+    color: var(--ink-mid);
+    border-color: var(--ink-mid);
+  }
+
+  .cta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 2px;
+    text-align: right;
+  }
+
+  .cta-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .cta-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .cta-value:hover {
+    color: var(--ink-mid);
+    border-color: var(--ink-mid);
+  }
+
+  footer {
+    padding: 32px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-mark {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--dot);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #6aab6a;
+    margin-right: 6px;
+    vertical-align: middle;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 500px) {
+    header { flex-direction: column; align-items: flex-start; }
+    .header-meta { text-align: left; }
+    .connect-block { flex-direction: column; }
+    .connect-cta { align-items: flex-start; }
+    .cta-label, .cta-value { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <header>
+    <div class="name-block">
+      <div class="label">Portfolio · 2026</div>
+      <h1>Jake<br>Derfel</h1>
+    </div>
+    <div class="header-meta">
+      <div class="meta-line"><strong>UW-Madison</strong></div>
+      <div class="meta-line">Data Science</div>
+      <div class="meta-line">Senior · 2027</div>
+      <div class="meta-line" style="margin-top: 8px;">Highland Park, IL</div>
+      <div class="meta-line">Chicago / Madison</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">About</span>
+      <div class="section-rule"></div>
+    </div>
+    <p>I'm drawn to the places where business, technology, and entrepreneurship overlap, and I've been lucky to explore that from a few different angles. Last year I owned and operated Camp Cuamba, a summer camp in Highland Park, Illinois, and this year I own and operate College Coolers, a water delivery service serving residents in the Madison area. Running both taught me firsthand about AI optimization, managing teams, and creatively marketing brands.</p>
+    <p>Alongside College Coolers, I spent a semester in Milan working as a Consulting Analyst intern at World Capital Group, a commercial real estate advisory firm, and I'm now back stateside interning as an Equity Research Analyst at North Star Investment Management in Chicago, where I analyze companies, industries, and investment opportunities.</p>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Experience</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="timeline">
+
+      <div class="timeline-item">
+        <div class="t-year">Now</div>
+        <div class="t-line"><div class="t-dot"></div><div class="t-connector"></div></div>
+        <div class="t-content">
+          <div class="t-role">Equity Research Analyst Intern</div>
+          <div class="t-org">North Star Investment Management · Chicago</div>
+          
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="t-year">Now</div>
+        <div class="t-line"><div class="t-dot"></div><div class="t-connector"></div></div>
+        <div class="t-content">
+          <div class="t-role">Own & Operate · College Coolers</div>
+          <div class="t-org">Madison, WI</div>
+          
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="t-year">Now</div>
+        <div class="t-line"><div class="t-dot"></div><div class="t-connector"></div></div>
+        <div class="t-content">
+          <div class="t-role">Executive Advisor · Wealth Management Group</div>
+          <div class="t-org">UW–Madison · Formerly Vice President</div>
+          
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="t-year">2025–2026</div>
+        <div class="t-line"><div class="t-dot"></div><div class="t-connector"></div></div>
+        <div class="t-content">
+          <div class="t-role">Consulting Analyst Intern</div>
+          <div class="t-org">World Capital Group · Milan</div>
+          
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="t-year">2024–2026</div>
+        <div class="t-line"><div class="t-dot"></div><div class="t-connector"></div></div>
+        <div class="t-content">
+          <div class="t-role">Owner & Operator · Camp Cuamba</div>
+          <div class="t-org">Highland Park, IL</div>
+          
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Connect</span>
+      <div class="section-rule"></div>
+    </div>
+    <div class="connect-block">
+      <div class="connect-text">
+        <p>If you're building something or thinking through a problem, I'd love to connect. Always open to conversations with people doing interesting work.</p>
+      </div>
+      <div class="connect-cta">
+        <div class="cta-group">
+          <div class="cta-label">Email</div>
+          <a class="cta-value" href="mailto:derfel@wisc.edu">derfel@wisc.edu</a>
+        </div>
+        <div class="cta-group" style="margin-top: 12px;">
+          <div class="cta-label">LinkedIn</div>
+          <a class="cta-value" href="https://www.linkedin.com/in/jacobderfel" target="_blank">linkedin.com/in/jacobderfel</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+<section>
+  <div style="text-align:center;">
+    <img src="jake_headshot_nobg.png" alt="Jake Derfel" style="max-width:320px;width:100%;height:auto;">
+  </div>
+</section>
+
+<footer>
+    <span class="footer-mark">Jake Derfel · 2026</span>
+    <span class="footer-mark"><span class="status-dot"></span>Open to connect</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
